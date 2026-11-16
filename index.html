@@ -189,7 +189,7 @@ nav button.on{background:var(--char2);color:#fff}
 .tools button{border:0;background:var(--sky-t);border-radius:999px;padding:8px 13px;cursor:pointer;font-weight:600;font-size:13px}
 .tools button:hover{background:var(--sky)}
 .tools .hint{font-size:12.5px;color:var(--muted);padding:0 6px}
-.fields{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-top:6px}
+.fields{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px;margin-top:6px}
 .acts-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
 .ph-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .ph-h h3{margin:0;font-size:28px;color:var(--char2)}
@@ -236,7 +236,14 @@ label.f{display:block;margin:16px 0 6px;color:var(--muted)}
 .in,select.in,textarea.in{width:100%;border:1.5px solid transparent;background:#F1F7FB;border-radius:14px;padding:11px 14px;outline:none;font-size:15px}
 .in:focus{border-color:var(--sky);background:#fff}
 textarea.in{resize:vertical}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.grid2>*,.fields>*{min-width:0}
+.in{min-width:0;max-width:100%}
+input.in[type=date],input.in[type=month]{-webkit-appearance:none;appearance:none;display:block;min-height:46px;text-align:left}
+input.in::-webkit-date-and-time-value{text-align:left}
+@media (pointer:coarse){.in,select.in,textarea.in{font-size:16px}}
+.hint-touch{display:none}
+@media (pointer:coarse){.hint-touch{display:inline}.hint-desk{display:none}}
 .imgpick{border:2px dashed var(--sky);border-radius:20px;min-height:170px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:radial-gradient(circle at 50% 45%,#fff 0 30%,var(--sky-t) 80%);overflow:hidden;text-align:center;color:var(--muted);font-size:13px;padding:10px;outline:none}
 .imgpick .big{font-family:var(--serif);font-style:normal;font-size:26px;color:var(--char2);display:block}
 .imgpick:focus{border-color:var(--sky-d)}
@@ -445,7 +452,7 @@ function closeModal(){const o=$('.ov');if(o)o.remove();if(modalCleanup){modalCle
 
 function imgPicker(m,initial,{bg=true}={}){
   let val=initial||'';const box=$('.imgpick',m),file=$('input[type=file]',box),url=$('[name=imgurl]',m),bgBtn=$('[data-bg]',m);
-  const show=()=>{box.innerHTML=val?`<img src="${esc(val)}" alt="">`:`<div><span class="big">drop a photo ✦</span>แตะเพื่อเลือกรูป · วางรูปด้วย ⌘/Ctrl+V · ลากไฟล์มาวาง</div>`;box.appendChild(file);if(bgBtn)bgBtn.classList.toggle('hide',!val||!bg)};
+  const show=()=>{box.innerHTML=val?`<img src="${esc(val)}" alt="">`:`<div><span class="big">drop a photo ✦</span><span class="hint-desk">แตะเพื่อเลือกรูป · วางรูปด้วย ⌘/Ctrl+V · ลากไฟล์มาวาง</span><span class="hint-touch">แตะเพื่อเลือกรูปจากคลังรูป หรือถ่ายรูปใหม่</span></div>`;box.appendChild(file);if(bgBtn)bgBtn.classList.toggle('hide',!val||!bg)};
   const setFile=async f=>{if(!f||!f.type.startsWith('image/'))return;box.innerHTML='<div>กำลังโหลดรูป…</div>';box.appendChild(file);val=await fileToData(f);url.value='';show()};
   box.onclick=()=>file.click();box.onkeydown=e=>{if(e.key==='Enter')file.click()};
   file.onchange=()=>setFile(file.files[0]);
