@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#BEE2F4">
 <title>moodrobe</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -26,7 +26,8 @@
   --card-sh:0 18px 40px -24px rgba(47,127,168,.6);
 }
 *{box-sizing:border-box}
-html,body{margin:0}
+html,body{margin:0;overflow-x:hidden;max-width:100%}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font-family:var(--sans);color:var(--char2);font-size:15px;line-height:1.55;padding-bottom:110px;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
   background:linear-gradient(180deg,#BEE2F4 0px,#DDF0F9 380px,#F5F1E8 900px,#F5F1E8 100%);background-color:var(--milk);min-height:100vh;position:relative}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -286,6 +287,24 @@ input.in::-webkit-date-and-time-value{text-align:left}
 .d-thin{--f:transparent;--st:#2F7FA8;--sw:3.5;--pf:#2F7FA8;--pfw:3.5;--ln:#2F7FA8;--ink:#2F7FA8;--hl:0;--sbg:none;--sf:#2F7FA8;--snw:3.5;filter:none}
 .dc.d-soft{opacity:.68}
 @keyframes tw{50%{transform:scale(.75);opacity:.4}}
+.ov,.modal{overflow-x:hidden}
+@media (max-width:640px){
+  .modal{max-height:86vh;max-height:86dvh;border-radius:26px 26px 0 0}
+  .mh{padding:16px 18px 8px;border-radius:26px 26px 0 0}
+  .mh h3{font-size:20px}
+  .x-close{width:34px;height:34px;font-size:18px}
+  .mb{padding:0 18px}
+  label.f{margin:12px 0 5px;font-size:10px}
+  .imgpick{min-height:110px;border-radius:16px;padding:8px}
+  .imgpick .big{font-size:21px}
+  .imgpick img{max-height:180px}
+  .in,select.in,textarea.in{padding:10px 12px;border-radius:12px}
+  textarea.in{min-height:64px}
+  .urlrow{margin-top:6px}
+  .mfoot{margin-top:18px;position:sticky;bottom:0;background:#fff;padding:10px 0 4px}
+  .mfoot .btn,.mfoot .bub{padding:11px 20px}
+  .rate button{font-size:12px}
+}
 #snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:25}
 .fl{animation:fl 4s ease-in-out infinite}@keyframes fl{50%{transform:translateY(-8px)}}
 .wb{animation:wb 3.4s ease-in-out infinite}@keyframes wb{50%{transform:translateY(-6px)}}
