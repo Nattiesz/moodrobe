@@ -305,6 +305,14 @@ input.in::-webkit-date-and-time-value{text-align:left}
   .mfoot .btn,.mfoot .bub{padding:11px 20px}
   .rate button{font-size:12px}
 }
+.sh-imgs{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;min-height:120px;align-items:center}
+.sh-imgs figure{margin:0;flex:none;text-align:center}
+.sh-imgs img{display:block;height:210px;width:auto;border-radius:12px;box-shadow:0 8px 20px -10px rgba(38,45,55,.45)}
+.sh-imgs figcaption{font-size:11px;color:var(--muted);margin-top:6px}
+.sh-load{padding:30px 10px;color:var(--muted);font-size:13px}
+.sh-note{background:#F1F7FB;border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.sh-note.warn{background:#FFF4E5;color:#8A5A14}
+@media (max-width:640px){.sh-imgs img{height:170px}}
 #snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:25}
 .fl{animation:fl 4s ease-in-out infinite}@keyframes fl{50%{transform:translateY(-8px)}}
 .wb{animation:wb 3.4s ease-in-out infinite}@keyframes wb{50%{transform:translateY(-6px)}}
@@ -501,12 +509,13 @@ function itemModal(item,{wish}={}){
     <div><label class="f lbl">Shop in · เดือน</label><input class="in" name="shopMonth" type="month" value="${esc(it.shopMonth||S.month)}"></div></div>`:
     `<label class="f lbl">Price · ราคา (ไม่ใส่ก็ได้)</label><input class="in" name="price" type="number" inputmode="decimal" value="${esc(it.price)}">`}
     <label class="f lbl">Link · ลิงก์ร้าน</label><input class="in" name="link" value="${esc(it.link)}" placeholder="https://shopee… / IG / TikTok">
+    <label class="f lbl">Affiliate link · ลิงก์ affiliate</label><input class="in" name="aff" value="${esc(it.aff)}" placeholder="ลิงก์จาก Shopee / Lazada Affiliate (ใช้ตอนแชร์)">
     <label class="f lbl">Note · โน้ต</label><textarea class="in" name="note" rows="2" placeholder="ไซซ์ M, รอลดราคา 12.12…">${esc(it.note)}</textarea>
     <div class="mfoot">${item?'<button class="lnk warn" data-del>Delete</button>':''}<button class="btn w" data-close>Cancel</button><button class="btn" data-save>Save ✦</button></div>`);
   const getImg=imgPicker(m,it.img);
   $('[data-save]',m).onclick=async()=>{
     const v=n=>$(`[name=${n}]`,m)?.value.trim()??'';
-    Object.assign(it,{name:v('name')||cat(v('cat'))[2],cat:v('cat'),color:v('color'),price:v('price'),link:v('link'),note:v('note'),img:getImg()});
+    Object.assign(it,{name:v('name')||cat(v('cat'))[2],cat:v('cat'),color:v('color'),price:v('price'),link:v('link'),aff:v('aff'),note:v('note'),img:getImg()});
     if($('[name=shopMonth]',m))it.shopMonth=v('shopMonth')||S.month;
     await save('items',it);closeModal();render();toast('Saved ♡ บันทึกแล้ว');
   };
@@ -598,7 +607,7 @@ function renderMatch(){
       <div class="tools" id="tools"></div>
       <div class="fields"><div><label class="f lbl">Look name</label><input class="in" id="lookName" value="${esc(e.name)}" placeholder="Christmas ootd"></div>
       <div><label class="f lbl">Wear on</label><input class="in" type="date" id="lookDate" value="${esc(e.date)}"></div></div>
-      <div class="acts-row"><button class="bub" data-savelook>${e.id?'Update look':'Save look'} ✦</button><button class="btn w" data-random>🎲 Shuffle</button><span style="flex:1"></span><button class="lnk" data-clear>Clear</button></div>
+      <div class="acts-row"><button class="bub" data-savelook>${e.id?'Update look':'Save look'} ✦</button><button class="btn w" data-random>🎲 Shuffle</button>${e.id?`<button class="btn w" data-share="${e.id}">Share ✦</button>`:''}<span style="flex:1"></span><button class="lnk" data-clear>Clear</button></div>
     </div>
     <div class="panel">
       <div class="ph-h"><h3 class="it">from your closet</h3><label class="tick"><input type="checkbox" id="pickWish" ${S.pickWish?'checked':''}>รวมของที่อยากได้</label></div>
@@ -615,7 +624,7 @@ function renderMatch(){
     return `<div class="pol"><span class="tape"></span>${polDeco(n)}<div class="im tall"><div class="board mini" data-openlook="${o.id}">${boardHTML(o,false)}</div></div>
     <div class="cap"><span class="it">${esc(o.name||'ootd')}</span>${avg?`<span class="score">${avg.toFixed(1)}<small>/10</small></span>`:''}</div>
     <div class="sub">${o.date?fmtDate(o.date):'ยังไม่กำหนดวัน'}${ls.length?` · ใส่แล้ว ${ls.length} ครั้ง`:''}</div>
-    <div class="acts"><button class="lnk" data-wear="${o.id}">Wear it ✦</button><button class="lnk" data-openlook="${o.id}">Edit</button><button class="lnk warn" data-dellook="${o.id}">Delete</button></div></div>`}).join('')}</div>`
+    <div class="acts"><button class="lnk" data-share="${o.id}">Share ✦</button><button class="lnk" data-wear="${o.id}">Wear it</button><button class="lnk" data-openlook="${o.id}">Edit</button><button class="lnk warn" data-dellook="${o.id}">Delete</button></div></div>`}).join('')}</div>`
   :empty('No looks','make your first fit ✦','จัดลุคบนบอร์ดด้านบน แล้วกด Save look')}</div>`;
 }
 function renderTools(){
@@ -732,6 +741,149 @@ function renderDiary(){
   :empty('No fits yet','go out & wear it ✦','แต่งตัวเสร็จ ออกไปใช้ชีวิต แล้วถ่ายรูปมาเก็บ ให้คะแนนลุคตัวเองได้เลย')}</div>`;
 }
 
+/* ---------- SHARE (post kit for Lemon8 / IG) ---------- */
+const SW=1080,SH=1440;
+const mkCanvas=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
+const loadSafe=src=>new Promise(res=>{if(!src)return res(null);const im=new Image();if(!src.startsWith('data:'))im.crossOrigin='anonymous';im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src});
+async function fontsReady(){try{await Promise.all(['400 60px "Instrument Serif"','900 60px Archivo','800 30px Archivo','600 30px Archivo','500 30px "IBM Plex Sans Thai"'].map(f=>document.fonts.load(f)))}catch(e){}}
+let stickerCSS=null;
+function getStickerCSS(){if(stickerCSS!==null)return stickerCSS;let out='';
+  for(const sh of document.styleSheets){let rules;try{rules=sh.cssRules}catch(e){continue}
+    for(const r of rules)if(r.selectorText&&/^\.(s-|d-)/.test(r.selectorText))out+=r.cssText+'\n'}
+  return stickerCSS=out}
+const svgCache={};
+async function svgStickerImg(t,v){const k=t+'|'+v;if(k in svgCache)return svgCache[k];
+  const sp=document.querySelector('body > svg');
+  const str=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 120 120" width="480" height="480"><style>${getStickerCSS()}</style>${sp?sp.innerHTML:''}<g class="${v}"><use href="#s-${t}"/></g></svg>`;
+  return svgCache[k]=await loadSafe('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(str))}
+async function drawSvgSticker(x,t,v,cx,cy,size,rot=0){const im=await svgStickerImg(t,v);if(!im)return;
+  x.save();x.translate(cx,cy);x.rotate(rot*Math.PI/180);const d=size*1.2;x.drawImage(im,-d/2,-d/2,d,d);x.restore()}
+function fitText(x,t,maxW){t=String(t||'');if(x.measureText(t).width<=maxW)return t;while(t.length>1&&x.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'}
+const toBlob=c=>new Promise((res,rej)=>{try{c.toBlob(b=>b?res(b):rej(new Error('blob')),'image/png')}catch(e){rej(e)}});
+
+async function renderBoardCanvas(o,warn){
+  const c=mkCanvas(SW,SH),x=c.getContext('2d'),cq=SW/100;
+  x.fillStyle='#fff';x.fillRect(0,0,SW,SH);
+  await drawSvgSticker(x,'sparkle','d-softsky',6.5*cq,SH*.44+3.5*cq,7*cq);
+  await drawSvgSticker(x,'sparkle','d-softsky',SW-6.5*cq,SH-6.5*cq,5*cq);
+  x.fillStyle='#262D37';x.textAlign='center';x.textBaseline='top';
+  x.font=`400 ${10*cq}px "Instrument Serif", Georgia, serif`;x.fillText(o.name||'ootd',SW/2,4*cq);
+  if(o.date){x.font=`600 ${2.6*cq}px Archivo, sans-serif`;x.fillStyle='#2F7FA8';if('letterSpacing' in x)x.letterSpacing=`${.5*cq}px`;
+    x.fillText(fmtDate(o.date).toUpperCase(),SW/2,15.5*cq);if('letterSpacing' in x)x.letterSpacing='0px'}
+  for(const p of [...o.pieces].sort((a,b)=>(a.z||1)-(b.z||1))){
+    const cx=p.x/100*SW,cy=p.y/100*SH,rot=(p.r||0)*Math.PI/180;
+    if(p.type==='item'){const it=itemById(p.itemId);if(!it)continue;const im=await loadSafe(it.img);
+      if(!im){warn.add(it.name);continue}
+      const w=p.w/100*SW,h=w*im.naturalHeight/im.naturalWidth;
+      x.save();x.translate(cx,cy);x.rotate(rot);if(p.f)x.scale(-1,1);
+      x.shadowColor='rgba(38,45,55,.16)';x.shadowBlur=1.4*cq;x.shadowOffsetY=1.4*cq;
+      x.drawImage(im,-w/2,-h/2,w,h);x.restore()}
+    else if(p.type==='svg')await drawSvgSticker(x,p.t,p.v,cx,cy,p.w/100*SW,p.r||0);
+    else{x.save();x.translate(cx,cy);x.rotate(rot);x.textAlign='center';x.textBaseline='middle';
+      x.font=p.type==='text'?`400 ${p.w*.5*cq}px "Instrument Serif", Georgia, serif`:`${p.w*.5*cq}px "Apple Color Emoji","Segoe UI Emoji",sans-serif`;
+      x.fillStyle='#2F7FA8';x.fillText(p.t,0,0);x.restore()}
+  }
+  x.globalAlpha=.45;x.fillStyle='#262D37';x.textAlign='left';x.textBaseline='alphabetic';
+  x.font=`900 ${2.6*cq}px Archivo, sans-serif`;x.fillText('moodrobe',3.5*cq,SH-3.2*cq);x.globalAlpha=1;
+  return c;
+}
+async function renderPhotoCanvas(log){
+  const im=await loadSafe(log.photo);if(!im)return null;
+  const c=mkCanvas(SW,SH),x=c.getContext('2d');
+  const s=Math.max(SW/im.naturalWidth,SH/im.naturalHeight),w=im.naturalWidth*s,h=im.naturalHeight*s;
+  x.drawImage(im,(SW-w)/2,(SH-h)/2,w,h);
+  const label=[fmtDate(log.date),log.place,log.rating?log.rating+'/10':''].filter(Boolean).join('  ·  ');
+  x.font='600 30px "IBM Plex Sans Thai", Archivo, sans-serif';const tw=x.measureText(label).width;
+  x.fillStyle='rgba(255,255,255,.9)';x.beginPath();x.roundRect(40,SH-40-64,tw+56,64,32);x.fill();
+  x.fillStyle='#262D37';x.textBaseline='middle';x.fillText(label,68,SH-40-32);
+  return c;
+}
+async function renderItemsCanvas(o,items,warn){
+  const c=mkCanvas(SW,SH),x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,SH);g.addColorStop(0,'#BEE2F4');g.addColorStop(.35,'#DDF0F9');g.addColorStop(.8,'#F5F1E8');
+  x.fillStyle=g;x.fillRect(0,0,SW,SH);
+  await drawSvgSticker(x,'sparkle','d-soft',110,120,56);await drawSvgSticker(x,'heart','d-soft',SW-110,120,48);
+  x.textAlign='center';x.textBaseline='alphabetic';x.fillStyle='#262D37';
+  if('fontStretch' in x)x.fontStretch='expanded';x.font='900 92px Archivo, sans-serif';x.fillText('SHOP THE LOOK',SW/2,150);
+  if('fontStretch' in x)x.fontStretch='normal';
+  x.font='400 52px "Instrument Serif", Georgia, serif';x.fillStyle='#2F7FA8';x.fillText(fitText(x,o.name||'ootd',SW-160),SW/2,222);
+  const list=items.slice(0,9),n=list.length||1,cols=n<=4?2:3,rows=Math.ceil(n/cols),gap=28,top=280,availH=1050,padX=60;
+  const cw=(SW-padX*2-gap*(cols-1))/cols,ch=Math.min(cw*1.3,(availH-gap*(rows-1))/rows);
+  const gridH=rows*ch+(rows-1)*gap,y0=top+(availH-gridH)/2;
+  for(let i=0;i<list.length;i++){
+    const it=list[i],cx=padX+(i%cols)*(cw+gap),cy=y0+Math.floor(i/cols)*(ch+gap);
+    x.save();x.shadowColor='rgba(47,127,168,.28)';x.shadowBlur=30;x.shadowOffsetY=12;x.fillStyle='#fff';x.beginPath();x.roundRect(cx,cy,cw,ch,34);x.fill();x.restore();
+    const ip=16,iw=cw-ip*2,ih=ch-ip*2-(cols===3?70:84);
+    const rg=x.createRadialGradient(cx+cw/2,cy+ip+ih*.45,0,cx+cw/2,cy+ip+ih*.45,iw*.7);rg.addColorStop(0,'#fff');rg.addColorStop(.4,'#fff');rg.addColorStop(1,'#DDF0F9');
+    x.fillStyle=rg;x.beginPath();x.roundRect(cx+ip,cy+ip,iw,ih,24);x.fill();
+    const im=await loadSafe(it.img);
+    if(im){const pad=iw*.1,bw=iw-pad*2,bh=ih-pad*2,s=Math.min(bw/im.naturalWidth,bh/im.naturalHeight),w=im.naturalWidth*s,h=im.naturalHeight*s;
+      x.drawImage(im,cx+ip+(iw-w)/2,cy+ip+(ih-h)/2,w,h)}else if(it.img)warn.add(it.name);
+    x.fillStyle='#262D37';x.beginPath();x.arc(cx+ip+30,cy+ip+30,22,0,7);x.fill();
+    x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.font='800 24px Archivo, sans-serif';x.fillText(String(i+1),cx+ip+30,cy+ip+31);
+    const fs=cols===3?24:30,ty=cy+ch-ip-(cols===3?30:36);
+    x.textBaseline='middle';x.fillStyle='#262D37';
+    const price=it.price?baht(it.price):'';x.font=`800 ${fs}px Archivo, sans-serif`;const pw=price?x.measureText(price).width+12:0;
+    x.textAlign='right';if(price)x.fillText(price,cx+cw-ip-6,ty);
+    x.textAlign='left';x.font=`500 ${fs}px "IBM Plex Sans Thai", Archivo, sans-serif`;x.fillText(fitText(x,it.name,cw-ip*2-12-pw),cx+ip+6,ty);
+  }
+  x.textAlign='center';x.textBaseline='alphabetic';x.fillStyle='#5E6876';x.font='500 30px "IBM Plex Sans Thai", Archivo, sans-serif';
+  x.fillText(items.length>9?`+ อีก ${items.length-9} ชิ้นในแคปชัน · links in caption ✦`:'links in caption ✦',SW/2,SH-90);
+  x.font='900 30px Archivo, sans-serif';x.fillStyle='#262D37';x.globalAlpha=.5;x.fillText('moodrobe',SW/2,SH-44);x.globalAlpha=1;
+  return c;
+}
+function buildCaption(o,items,log){
+  const L=[`${o.name||'ootd'} ✦`];
+  if(log){L.push([fmtDate(log.date),log.place,log.rating?log.rating+'/10':''].filter(Boolean).join(' · '));if(log.note)L.push(log.note)}
+  L.push('','Shop the look ✦');
+  items.forEach((it,i)=>{L.push(`${i+1}. ${it.name}${it.price?' — '+baht(it.price):''}`);const u=it.aff||it.link;if(u)L.push(u)});
+  if(items.some(it=>it.aff))L.push('','ลิงก์ในโพสต์นี้เป็น affiliate link ♡');
+  L.push('','#ootd #แต่งตัว #ไอเดียแต่งตัว #lookbook #moodrobe');
+  return L.join('\n');
+}
+async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){
+  const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+  let ok=false;try{ok=document.execCommand('copy')}catch(_){}ta.remove();return ok}}
+async function shareModal(id){
+  const o=outfitById(id);if(!o)return;
+  const items=[...new Set(o.pieces.filter(p=>p.type==='item').map(p=>p.itemId))].map(itemById).filter(Boolean);
+  const logs=S.logs.filter(l=>l.outfitId===id).sort((a,b)=>b.date.localeCompare(a.date));
+  const photoLog=logs.find(l=>l.photo),capLog=photoLog||logs[0];
+  const m=openModal('Share ✦',`
+    <p class="muted" style="margin:0 0 10px;font-size:13px">รูปพร้อมโพสต์ Lemon8 / IG (แนวตั้ง 3:4) และแคปชันพร้อมลิงก์ เซฟรูปแล้ววางแคปชันได้เลย</p>
+    <div class="sh-imgs" id="shImgs"><div class="sh-load">กำลังสร้างรูป…</div></div>
+    <div id="shNotes"></div>
+    <label class="f lbl">Caption · แคปชัน (แก้ได้)</label><textarea class="in" id="shCap" rows="9">${esc(buildCaption(o,items,capLog))}</textarea>
+    <div class="mfoot"><button class="btn w" id="shCopy">Copy caption</button><button class="btn" id="shSave" disabled>Save images</button></div>`);
+  $('#shCopy',m).onclick=async()=>toast(await copyText($('#shCap',m).value)?'Copied ✦ คัดลอกแคปชันแล้ว':'คัดลอกไม่ได้ ลองกดค้างที่ช่องแคปชันแล้วคัดลอกเอง');
+  await fontsReady();
+  const warn=new Set(),parts=[];
+  try{
+    parts.push(['look','ลุค',await renderBoardCanvas(o,warn)]);
+    if(photoLog){const pc=await renderPhotoCanvas(photoLog);if(pc)parts.push(['worn','ใส่จริง',pc])}
+    if(items.length)parts.push(['items','ไอเทม',await renderItemsCanvas(o,items,warn)]);
+  }catch(e){if(m.isConnected)$('#shImgs',m).innerHTML=`<div class="sh-load">สร้างรูปไม่สำเร็จ: ${esc(e.message)}</div>`;return}
+  if(!m.isConnected)return;
+  const slug=(o.name||'ootd').replace(/[^\w฀-๿]+/g,'-').replace(/^-|-$/g,'').slice(0,30)||'look';
+  let files;
+  try{files=await Promise.all(parts.map(async([k,,c],i)=>new File([await toBlob(c)],`moodrobe-${slug}-${i+1}-${k}.png`,{type:'image/png'})))}
+  catch(e){$('#shImgs',m).innerHTML='<div class="sh-load">สร้างรูปไม่สำเร็จ ลองอัปโหลดรูปไอเทมจากเครื่องแทนการใช้ลิงก์รูป</div>';return}
+  const urls=files.map(f=>URL.createObjectURL(f));
+  $('#shImgs',m).innerHTML=files.map((f,i)=>`<figure><a href="${urls[i]}" download="${esc(f.name)}"><img src="${urls[i]}" alt=""></a><figcaption>${i+1} · ${parts[i][1]}</figcaption></figure>`).join('');
+  const notes=[];
+  if(warn.size)notes.push(`<div class="sh-note warn">ไอเทมเหล่านี้ใช้รูปจากลิงก์ เลยใส่ในรูปไม่ได้: ${[...warn].map(esc).join(', ')} · แก้ได้โดยเซฟรูปแล้วอัปโหลดในไอเทมใหม่</div>`);
+  if(!photoLog)notes.push('<div class="sh-note">ยังไม่มีรูปตอนใส่จริงของลุคนี้ · กด Wear it แล้วบันทึกรูปในไดอารี่ จะได้รูปเพิ่มอีก 1 รูป</div>');
+  if(items.length&&!items.some(it=>it.aff))notes.push('<div class="sh-note">ยังไม่มีลิงก์ affiliate · ใส่ได้ในหน้าแก้ไขไอเทม ช่อง “Affiliate link” แคปชันจะใช้ลิงก์นั้นแทนลิงก์ร้าน</div>');
+  $('#shNotes',m).innerHTML=notes.join('');
+  const btn=$('#shSave',m);btn.disabled=false;
+  btn.onclick=async()=>{
+    if(navigator.canShare&&navigator.canShare({files})){try{await navigator.share({files});return}catch(e){if(e.name==='AbortError')return}}
+    files.forEach((f,i)=>setTimeout(()=>{const a=document.createElement('a');a.href=urls[i];a.download=f.name;document.body.appendChild(a);a.click();a.remove()},i*300));
+    toast('Saved ✦ ดาวน์โหลดรูปแล้ว');
+  };
+  const prev=modalCleanup;modalCleanup=()=>{urls.forEach(u=>URL.revokeObjectURL(u));prev&&prev()};
+}
+
 /* ---------- render & events ---------- */
 function render(){
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===S.tab));
@@ -766,9 +918,10 @@ const snowFx=(()=>{
 $('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.tab=b.dataset.tab;render();window.scrollTo(0,0)};
 $('[data-home]').onclick=()=>{S.tab='shop';render();window.scrollTo(0,0)};
 $('#main').addEventListener('click',async e=>{
-  const t=e.target.closest('[data-svg],[data-add-wish],[data-add-closet],[data-edit],[data-buy],[data-mon],[data-ccat],[data-tomatch],[data-pcat],[data-pick],[data-stk],[data-text],[data-t],[data-random],[data-clear],[data-newlook],[data-savelook],[data-openlook],[data-dellook],[data-wear],[data-addlog],[data-dmon],[data-day],[data-log]');
+  const t=e.target.closest('[data-share],[data-svg],[data-add-wish],[data-add-closet],[data-edit],[data-buy],[data-mon],[data-ccat],[data-tomatch],[data-pcat],[data-pick],[data-stk],[data-text],[data-t],[data-random],[data-clear],[data-newlook],[data-savelook],[data-openlook],[data-dellook],[data-wear],[data-addlog],[data-dmon],[data-day],[data-log]');
   if(!t)return;const d=t.dataset;
   if(d.svg){const [st,sv]=d.svg.split('|');S.edit.pieces.push({type:'svg',t:st,v:sv,x:20+Math.random()*60,y:20+Math.random()*60,w:14,z:maxZ()+1,r:0});S.sel=S.edit.pieces.length-1;redrawBoard()}
+  else if(d.share)shareModal(d.share);
   else if('addWish' in d)itemModal(null,{wish:true});
   else if('addCloset' in d)itemModal(null,{wish:false});
   else if(d.edit)itemModal(itemById(d.edit));
